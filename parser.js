@@ -1,7 +1,7 @@
 const fs = require('fs');
 const csv = require('csv-parser');
 
-const results = [];
+let results = [];
 
 fs.createReadStream('speaker_data.csv')
 	.pipe(csv())
@@ -10,18 +10,32 @@ fs.createReadStream('speaker_data.csv')
 
 		console.log(results)
 
-		const output = results.filter(speaker => {
+		results = results.filter(speaker =>
+		{
 			let empty = true
 			for (const key of Object.keys(speaker))
 			{
-				if(speaker[key]) {
+				if (speaker[key])
+				{
 					empty = false
 				}
 			}
 			return !empty
 		})
 
-		const jsonData = JSON.stringify(output, null, 2);
+		const formattedResults = {}
+		for (const speaker of results)
+		{
+			const year = speaker.year
+			if (!formattedResults[year])
+			{
+				formattedResults[year] = []
+				delete speaker.year
+				formattedResults[year].push(speaker)
+			}
+		}
+
+		const jsonData = JSON.stringify(formattedResults, null, 2);
 		fs.writeFile('speaker_data.json', jsonData, (err) =>
 		{
 			if (err)
@@ -31,4 +45,5 @@ fs.createReadStream('speaker_data.csv')
 			}
 			console.log('JSON file has been saved!');
 		})
-	});
+	})
+
