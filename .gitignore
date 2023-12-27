@@ -1,3 +1,4 @@
 .idea*
 node_modules
-.env
+speaker_data.csv
+speaker_data.json

@@ -1,17 +1,23 @@
-require('dotenv').config();
-const axios = require('axios');
+const fs = require('fs');
+const csv = require('csv-parser');
 
-const apiKey = process.env.API_KEY;
-const sheetId = process.env.SHEET_ID;
-const sheetRange = 'Sheet1';
+const results = [];
 
-const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetRange}?key=${apiKey}&alt=csv`;
+fs.createReadStream('speaker_data.csv')
+	.pipe(csv())
+	.on('data', (data) => results.push(data))
+	.on('end', () => {
 
-axios.get(url)
-	.then(response => {
-		// Handle the response data
-		console.log(response.data);
-	}).catch(error => {
-		// Handle errors
-		console.error('There was an error fetching the data:', error);
+		console.log(results)
+
+		const jsonData = JSON.stringify(results, null, 2);
+		fs.writeFile('speaker_data.json', jsonData, (err) =>
+		{
+			if (err)
+			{
+				console.error('Error writing JSON file:', err);
+				return;
+			}
+			console.log('JSON file has been saved!');
+		})
 	});
