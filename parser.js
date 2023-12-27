@@ -10,7 +10,18 @@ fs.createReadStream('speaker_data.csv')
 
 		console.log(results)
 
-		const jsonData = JSON.stringify(results, null, 2);
+		const output = results.filter(speaker => {
+			let empty = true
+			for (const key of Object.keys(speaker))
+			{
+				if(speaker[key]) {
+					empty = false
+				}
+			}
+			return !empty
+		})
+
+		const jsonData = JSON.stringify(output, null, 2);
 		fs.writeFile('speaker_data.json', jsonData, (err) =>
 		{
 			if (err)
